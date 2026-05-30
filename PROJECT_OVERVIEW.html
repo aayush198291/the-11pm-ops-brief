@@ -1,0 +1,788 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>The 11 PM Ops Brief — Project Overview</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:wght@300;400;600;700;800;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+<style>
+  :root {
+    --primary:#0061ff; --primary-dark:#0049c7; --primary-bg:#e6f0ff;
+    --success:#16a34a; --success-bg:#dcfce7;
+    --warning:#b45309; --warning-bg:#fef3c7;
+    --danger:#dc2626;  --danger-bg:#fee2e2;
+    --info:#0369a1;    --info-bg:#e0f2fe;
+    --purple:#7c3aed;  --purple-bg:#ede9fe;
+    --text:#111827; --text-2:#374151; --text-3:#6b7280;
+    --border:#e5e7eb; --surface:#fff; --page:#f9fafb; --nav:#0f1729;
+    --r-sm:4px; --r-md:6px; --r-lg:8px;
+    --sh-sm:0 1px 2px rgba(0,0,0,.05); --sh:0 4px 16px rgba(0,0,0,.06);
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;font-family:"Nunito Sans",-apple-system,BlinkMacSystemFont,sans-serif;color:var(--text);background:var(--page);line-height:1.55;font-size:14px}
+  code,pre,.mono{font-family:"JetBrains Mono",ui-monospace,Menlo,monospace;font-size:12.5px}
+
+  /* Layout */
+  .container{max-width:1280px;margin:0 auto;padding:0 28px}
+  .pane{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);box-shadow:var(--sh-sm);margin:18px 0;overflow:hidden}
+  .pane-h{padding:14px 22px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;font-weight:800;font-size:13px;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px}
+  .pane-h .num{background:var(--primary-bg);color:var(--primary-dark);padding:2px 9px;border-radius:99px;font-size:11px;font-weight:800}
+  .pane-body{padding:24px}
+
+  /* Hero */
+  header.hero{background:linear-gradient(135deg,var(--nav) 0%,#1e293b 100%);color:#fff;padding:42px 0 36px;border-bottom:4px solid var(--primary)}
+  header.hero .container{display:grid;grid-template-columns:1fr 320px;gap:32px;align-items:start}
+  header.hero h1{font-size:36px;font-weight:900;margin:0 0 6px;letter-spacing:-.5px;line-height:1.1}
+  header.hero .moon{display:inline-block;font-size:32px;vertical-align:-2px;margin-right:6px}
+  header.hero .tagline{font-size:16px;font-weight:600;color:#cbd5e1;margin-bottom:18px}
+  header.hero .badges{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:18px}
+  header.hero .badge{font-size:11px;font-weight:700;padding:4px 10px;border-radius:99px;background:rgba(255,255,255,.1);color:#e2e8f0;border:1px solid rgba(255,255,255,.15)}
+  header.hero .badge.live{background:rgba(22,163,74,.18);border-color:rgba(34,197,94,.35);color:#86efac}
+  header.hero .badge.warn{background:rgba(180,83,9,.2);border-color:rgba(217,119,6,.35);color:#fde68a}
+  header.hero a.cta{display:inline-block;background:var(--primary);color:#fff;text-decoration:none;padding:11px 18px;border-radius:6px;font-weight:800;font-size:13px;margin-top:6px;margin-right:8px}
+  header.hero a.cta:hover{background:#2563eb}
+  header.hero a.cta.outline{background:transparent;border:1px solid rgba(255,255,255,.3);color:#fff}
+  header.hero .stats{background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:18px;font-size:12.5px}
+  header.hero .stats h3{font-size:11px;font-weight:800;color:#94a3b8;text-transform:uppercase;letter-spacing:.6px;margin:0 0 10px}
+  header.hero .stats table{width:100%;border-collapse:collapse}
+  header.hero .stats td{padding:5px 0;color:#cbd5e1;font-size:12.5px}
+  header.hero .stats td:last-child{text-align:right;color:#fff;font-weight:700;font-variant-numeric:tabular-nums}
+
+  /* TOC */
+  nav.toc{position:sticky;top:0;background:rgba(255,255,255,.95);backdrop-filter:blur(8px);border-bottom:1px solid var(--border);z-index:50;padding:10px 0}
+  nav.toc .container{display:flex;gap:0;overflow-x:auto;white-space:nowrap;font-size:12px;font-weight:700}
+  nav.toc a{color:var(--text-3);text-decoration:none;padding:8px 14px;border-radius:6px;margin-right:3px;transition:.15s}
+  nav.toc a:hover{background:var(--primary-bg);color:var(--primary-dark)}
+
+  /* Pills / chips */
+  .pill{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;padding:3px 9px;border-radius:99px;background:var(--primary-bg);color:var(--primary-dark);border:1px solid #c7dbff;letter-spacing:.2px;font-variant-numeric:tabular-nums}
+  .pill.live{background:var(--success-bg);color:var(--success);border-color:#86efac}
+  .pill.warn{background:var(--warning-bg);color:var(--warning);border-color:#fcd34d}
+  .pill.danger{background:var(--danger-bg);color:var(--danger);border-color:#fca5a5}
+  .pill.info{background:var(--info-bg);color:var(--info);border-color:#7dd3fc}
+  .pill.purple{background:var(--purple-bg);color:var(--purple);border-color:#c4b5fd}
+  .pill.muted{background:#f3f4f6;color:var(--text-2);border-color:var(--border)}
+  .dot{display:inline-block;width:7px;height:7px;border-radius:99px;background:var(--text-3);margin-right:4px}
+  .dot.live{background:var(--success);box-shadow:0 0 0 2px rgba(34,197,94,.18)}
+  .dot.synth{background:#3b82f6}
+  .dot.warn{background:var(--warning)}
+  .dot.danger{background:var(--danger)}
+
+  /* Grids */
+  .grid{display:grid;gap:14px}
+  .grid.cols-2{grid-template-columns:1fr 1fr}
+  .grid.cols-3{grid-template-columns:repeat(3,1fr)}
+  .grid.cols-4{grid-template-columns:repeat(4,1fr)}
+  .grid.cols-5{grid-template-columns:repeat(5,1fr)}
+  .card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-md);padding:14px 16px}
+  .card.bordered-l{border-left:3px solid var(--primary)}
+  .card .head{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .card .head .ic{font-size:18px}
+  .card h4{font-size:13px;font-weight:800;color:var(--text);margin:0}
+  .card .meta{font-size:11px;color:var(--text-3);font-weight:600;margin-bottom:8px}
+  .card p{font-size:12.5px;color:var(--text-2);margin:0;line-height:1.5}
+  .card .kv{font-size:11.5px;color:var(--text-3);font-family:"JetBrains Mono",monospace;margin-top:6px}
+  .card.subagent{border-top:3px solid var(--primary)}
+  .card.subagent.role-supervisor{border-top-color:var(--purple)}
+  .card.subagent.role-data{border-top-color:var(--info)}
+  .card.subagent.role-signal{border-top-color:var(--warning)}
+  .card.subagent.role-historian{border-top-color:#0ea5e9}
+  .card.subagent.role-composer{border-top-color:var(--success)}
+  .card.subagent.role-critic{border-top-color:var(--danger)}
+  .card.subagent.role-publisher{border-top-color:var(--text-2)}
+
+  /* Tables */
+  table.t{width:100%;border-collapse:collapse;font-size:12.5px}
+  table.t th{text-align:left;padding:10px 12px;font-weight:800;color:var(--text-3);font-size:11px;text-transform:uppercase;letter-spacing:.4px;border-bottom:2px solid var(--border);background:#fafbfc}
+  table.t td{padding:10px 12px;border-bottom:1px solid var(--border);vertical-align:top}
+  table.t tr:hover td{background:#fafbfc}
+  table.t td.center{text-align:center}
+  table.t td.right{text-align:right;font-variant-numeric:tabular-nums}
+  table.t td .ic{font-size:14px;margin-right:4px;vertical-align:-1px}
+
+  /* Severity gauge inline */
+  .sevbar{height:6px;background:#e5e7eb;border-radius:99px;overflow:hidden;width:80px;display:inline-block}
+  .sevbar > div{height:100%;border-radius:99px}
+
+  /* Architecture wrapper */
+  .arch{background:#fafbfc;border:1px solid var(--border);border-radius:8px;padding:16px;text-align:center}
+
+  /* Stat tiles */
+  .statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}
+  .stat{background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:14px 16px}
+  .stat .label{font-size:10.5px;color:var(--text-3);text-transform:uppercase;letter-spacing:.5px;font-weight:700}
+  .stat .val{font-size:24px;font-weight:900;color:var(--text);font-variant-numeric:tabular-nums;letter-spacing:-.5px;margin-top:2px}
+  .stat .sub{font-size:11.5px;color:var(--text-3);font-weight:600;margin-top:2px}
+
+  /* Section header */
+  h2{font-size:22px;font-weight:900;color:var(--text);margin:0 0 4px;letter-spacing:-.3px;display:flex;align-items:center;gap:10px}
+  h2 .sec-num{background:var(--text);color:#fff;font-size:11px;font-weight:800;width:24px;height:24px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-family:"JetBrains Mono",monospace}
+  h3{font-size:15px;font-weight:800;color:var(--text);margin:18px 0 8px}
+  h2 + .desc{color:var(--text-3);font-size:13px;margin:0 0 16px;line-height:1.6;max-width:780px}
+
+  /* Code */
+  pre{background:var(--nav);color:#e2e8f0;padding:14px;border-radius:6px;overflow-x:auto;font-size:11.5px;line-height:1.55}
+  code.inline{background:var(--primary-bg);color:var(--primary-dark);padding:1px 6px;border-radius:4px;font-size:11.5px}
+
+  /* Checkmark list */
+  ul.checks{list-style:none;padding:0;margin:0}
+  ul.checks li{padding:6px 0 6px 26px;position:relative;font-size:13px;color:var(--text-2);line-height:1.55}
+  ul.checks li::before{content:"";position:absolute;left:0;top:8px;width:16px;height:16px;border-radius:99px;background:var(--success-bg);color:var(--success);text-align:center;font-size:11px;line-height:16px;font-weight:900}
+  ul.checks li.done::before{content:"✓";background:var(--success);color:#fff}
+  ul.checks li.todo::before{content:"○";color:var(--text-3);background:transparent;border:1.5px solid var(--text-3);width:14px;height:14px;line-height:11px}
+  ul.checks li.warn::before{content:"!";background:var(--warning);color:#fff}
+
+  /* Rubric block */
+  .rubric{background:linear-gradient(180deg,#fff 0%,#fafbfc 100%);border:1px solid var(--border);border-radius:8px;padding:18px;margin:14px 0}
+  .rubric .rubric-h{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:10px}
+  .rubric h4{font-size:14px;font-weight:800;margin:0}
+  .rubric .weight{background:var(--primary);color:#fff;font-size:12px;font-weight:800;padding:3px 10px;border-radius:99px}
+  .rubric .rubric-body{display:grid;grid-template-columns:140px 1fr;gap:10px 18px;font-size:12.5px}
+  .rubric .rubric-body strong{color:var(--text-3);font-weight:700;font-size:11px;text-transform:uppercase;letter-spacing:.4px}
+  .rubric .rubric-body span{color:var(--text-2)}
+
+  /* Footer */
+  footer{padding:30px 0 60px;color:var(--text-3);font-size:12px;text-align:center}
+
+  /* Mermaid */
+  .mermaid{font-family:"Nunito Sans",sans-serif !important}
+
+  /* Misc */
+  .lead{font-size:14.5px;color:var(--text-2);line-height:1.65;max-width:880px}
+  .quote{border-left:4px solid var(--primary);background:var(--primary-bg);padding:10px 16px;border-radius:0 6px 6px 0;font-style:italic;color:var(--primary-dark);font-size:13px;margin:14px 0}
+  hr.spacer{border:0;height:18px;background:transparent;margin:0}
+  .small{font-size:11.5px;color:var(--text-3)}
+  .mono.small{font-family:"JetBrains Mono",monospace;font-size:11px}
+  .ext{font-size:9px;vertical-align:super;color:var(--info);text-decoration:none}
+
+  .timeline-evt{display:grid;grid-template-columns:80px 100px 1fr;gap:10px;align-items:start;padding:6px 0;border-bottom:1px dashed var(--border);font-size:12px}
+  .timeline-evt .ts{color:var(--text-3);font-family:"JetBrains Mono",monospace;font-size:11px}
+  .timeline-evt .actor{font-weight:800}
+  .timeline-evt .actor.super{color:var(--purple)}
+  .timeline-evt .actor.data{color:var(--info)}
+  .timeline-evt .actor.scout{color:var(--warning)}
+  .timeline-evt .actor.hist{color:#0ea5e9}
+  .timeline-evt .actor.comp{color:var(--success)}
+  .timeline-evt .actor.crit{color:var(--danger)}
+  .timeline-evt .actor.pub{color:var(--text-2)}
+  .timeline-evt .msg{color:var(--text-2)}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="container">
+    <div>
+      <h1><span class="moon">🌙</span>The 11 PM Ops Brief</h1>
+      <div class="tagline">Multi-agent supply-chain ops system · Databricks DNB Hackathon Track 1</div>
+      <div class="badges">
+        <span class="badge live"><span class="dot live"></span>App: RUNNING</span>
+        <span class="badge">5 specialist subagents</span>
+        <span class="badge">17 real-time signals (16 LIVE)</span>
+        <span class="badge">3 UC AI Functions</span>
+        <span class="badge">4 write-back actions</span>
+        <span class="badge">Vector Search recall</span>
+        <span class="badge">MLflow eval</span>
+        <span class="badge">Nightly Databricks Job</span>
+        <span class="badge warn">Submit by Fri 6 PM PT</span>
+      </div>
+      <a class="cta" href="https://ops-brief-apatel-7474650842988229.aws.databricksapps.com" target="_blank">▶ Open the deployed app</a>
+      <a class="cta outline" href="#rubric">Jump to rubric coverage</a>
+    </div>
+    <div class="stats">
+      <h3>at-a-glance</h3>
+      <table>
+        <tr><td>Track</td><td>1 (Technical)</td></tr>
+        <tr><td>Workspace</td><td>dnb-hackathon-west-2</td></tr>
+        <tr><td>App SP</td><td>app-43e3x5</td></tr>
+        <tr><td>Genie space</td><td>01f15aac…ae337</td></tr>
+        <tr><td>MLflow experiment</td><td>4469475842996134</td></tr>
+        <tr><td>MLflow run (latest)</td><td>8804a5d5…107e97</td></tr>
+        <tr><td>VS endpoint</td><td>ops_brief_vs (ONLINE)</td></tr>
+        <tr><td>Nightly job ID</td><td>65664408676995</td></tr>
+        <tr><td>Catalog.schema</td><td>dnb_hackathon_west_2.ops_brief</td></tr>
+        <tr><td>Synthetic shipments</td><td>30,511</td></tr>
+        <tr><td>Briefs archive</td><td>14 (May 14–27)</td></tr>
+        <tr><td>Code (agent_server)</td><td>~4,000 LoC</td></tr>
+      </table>
+    </div>
+  </div>
+</header>
+
+<nav class="toc">
+  <div class="container">
+    <a href="#problem">01 Problem</a>
+    <a href="#arch">02 Architecture</a>
+    <a href="#agents">03 Subagents</a>
+    <a href="#signals">04 17 Signals</a>
+    <a href="#ucfns">05 UC AI Fns</a>
+    <a href="#actions">06 Action Layer</a>
+    <a href="#recall">07 Vector Recall</a>
+    <a href="#ui">08 UI</a>
+    <a href="#eval">09 Eval</a>
+    <a href="#maturity">10 Maturity</a>
+    <a href="#rubric">11 Rubric</a>
+    <a href="#deliverables">12 Submit</a>
+    <a href="#files">13 Files</a>
+  </div>
+</nav>
+
+<main class="container">
+
+<!-- ============================== 1. PROBLEM ============================== -->
+<section id="problem">
+<hr class="spacer"><h2><span class="sec-num">01</span>The problem</h2>
+<p class="desc">Every supply-chain operator wakes up to the same dread question: <em>"what hit overnight?"</em> The answer lives in two unconnected worlds — internal data (in-flight shipments, at-risk revenue, active disruptions) and external signals (weather, port congestion, news pulse, carrier diversions, fuel prices, border waits, earthquakes, hurricanes, public-health alerts). Nobody reads all of it at 11 PM. Most of it never reaches the operator at all.</p>
+<div class="quote">The 11 PM Ops Brief is an autonomous multi-agent system that fuses all of it into a single grounded, executive-grade page — with proposed write-back actions — every night.</div>
+
+<div class="statgrid">
+  <div class="stat"><div class="label">In-flight tonight</div><div class="val">4,592</div><div class="sub">shipments tracked</div></div>
+  <div class="stat"><div class="label">At-risk shipments</div><div class="val">216</div><div class="sub">~$192,704 revenue</div></div>
+  <div class="stat"><div class="label">External feeds</div><div class="val">17</div><div class="sub">16 LIVE · 1 SYNTH</div></div>
+  <div class="stat"><div class="label">Subagents</div><div class="val">5</div><div class="sub">+ Supervisor + Publisher</div></div>
+</div>
+</section>
+
+<!-- ============================== 2. ARCHITECTURE ============================== -->
+<section id="arch">
+<hr class="spacer"><h2><span class="sec-num">02</span>Architecture</h2>
+<p class="desc">LangGraph supervisor over a deterministic plan-driven topology. Not "ReAct with lots of tools" — judges see the actual graph in MLflow. Each subagent has a curated tool bucket; cross-talk happens only through the shared <code class="inline">OpsState</code>.</p>
+
+<div class="arch">
+<div class="mermaid">
+flowchart TB
+    User([👤 Operator browser]) --> UI["Operational Console UI<br/>4-pane · light theme · ShipBob tokens"]
+
+    UI -- POST /invocations --> Server["MLflow Agent Server<br/>FastAPI · @invoke · @stream"]
+    UI -- GET /signals/latest --> Sig[/signals endpoint<br/>17-source fan-out + 60s cache/]
+    UI -- POST /actions/approve --> Act[/actions endpoint<br/>HITL approve/reject/]
+    UI -- GET /objects/lookup --> Obj[/object investigation<br/>FC · Carrier · Customer · Disruption/]
+
+    Server --> Sup{"🧠 Supervisor<br/>LLM planner<br/>(Pydantic structured output)"}
+
+    Sup -.plan=[data].-> DA["DataAnalyst<br/>create_react_agent"]
+    Sup -.plan=[signal].-> SS["SignalScout<br/>parallel fan-out then LLM compress"]
+    Sup -.plan=[history].-> HI["Historian<br/>create_react_agent"]
+    Sup -.plan=[compose].-> CO["Composer<br/>create_react_agent"]
+    Sup -.plan=[critic].-> CR["Critic<br/>LLM-only QC"]
+    Sup -.last.-> PU["Publisher<br/>canonical final message"]
+
+    DA -- Managed Genie MCP --> Genie[("Genie Space<br/>UC Metric Views<br/>shipment_metrics<br/>disruption_metrics<br/>brief_metrics")]
+    Genie --> Gold[("Gold Delta tables<br/>dnb_hackathon_west_2.ops_brief<br/>30,511 synthetic shipments")]
+
+    SS --> Sources["17 signal sources:<br/>NWS · GDELT · PortWatch · OpenSky · USGS · FEMA · NASA EONET · Reddit · Google News<br/>FAA TFRs · CBP Borders · HackerNews · EIA · Volcanoes · NOAA NHC · CDC HAN · Chokepoints"]
+    SS --> UCFns["3 UC AI Functions<br/>classify_disruption_severity<br/>summarize_signal_pulse<br/>carrier_risk_score"]
+
+    HI --> Memory["Memory tools<br/>get/save/delete"]
+    HI --> Genie
+    HI --> VS[("Vector Search index<br/>briefs_archive_index<br/>14-day semantic recall")]
+
+    CO --> ComposeTool[compose_brief]
+    CO --> Acts["Action tools<br/>propose_action<br/>file_disruption_ticket<br/>draft_carrier_email<br/>log_decision"]
+
+    Server -- "mlflow.langchain.autolog" --> MLflow[("MLflow 3 Tracing<br/>Agent Evaluation<br/>3 LLM-as-judge scorers")]
+
+    Job["Databricks Job<br/>23:00 CT nightly cron<br/>(paused)"] -. nightly POST .-> Server
+
+    classDef judge fill:#e6f0ff,stroke:#0061ff,color:#0049c7,stroke-width:2px;
+    class Sup,Genie,UCFns,MLflow,VS,Acts judge
+</div>
+</div>
+</section>
+
+<!-- ============================== 3. SUBAGENTS ============================== -->
+<section id="agents">
+<hr class="spacer"><h2><span class="sec-num">03</span>The 7 nodes of the supervisor graph</h2>
+<p class="desc">Each subagent is its own <code class="inline">create_react_agent</code> with a curated tool subset. The Supervisor's <code class="inline">Plan</code> is a Pydantic-validated structured output — the graph walks it deterministically. Routing is plan-driven, not LLM-driven at each hop, which keeps traces clean and reproducible.</p>
+
+<div class="grid cols-3">
+
+  <div class="card subagent role-supervisor">
+    <div class="head"><span class="ic">🧠</span><h4>Supervisor</h4></div>
+    <div class="meta">planner · 1 LLM call</div>
+    <p>Reads the user query, emits an ordered plan: <code class="inline">["data_analyst","signal_scout","historian","composer","critic"]</code> for a full brief; <code class="inline">["data_analyst"]</code> for a count question.</p>
+    <div class="kv">tools: none — pure planner · output: Plan (Pydantic)</div>
+  </div>
+
+  <div class="card subagent role-data">
+    <div class="head"><span class="ic">📊</span><h4>DataAnalyst</h4></div>
+    <div class="meta">internal data via Genie MCP</div>
+    <p>Queries the Genie space (UC Metric Views). Drives the <code class="inline">query_space_*</code> / <code class="inline">poll_response_*</code> polling loop. Returns numbers + the underlying Genie SQL.</p>
+    <div class="kv">tools: Genie MCP tools + get_current_time</div>
+  </div>
+
+  <div class="card subagent role-signal">
+    <div class="head"><span class="ic">📡</span><h4>SignalScout</h4></div>
+    <div class="meta">17 external feeds · parallel</div>
+    <p><strong>Parallelized:</strong> asyncio.gather fans out across all 17 signal tools, then a single LLM call compresses results into 3-6 bullets. ~26s (was ~90s).</p>
+    <div class="kv">tools: 17 fetch_* + 3 UC AI Functions</div>
+  </div>
+
+  <div class="card subagent role-historian">
+    <div class="head"><span class="ic">📚</span><h4>Historian</h4></div>
+    <div class="meta">memory + Vector Search recall</div>
+    <p>Recalls past briefs via Vector Search (briefs_archive_index) — semantic match returns recurring themes. Memory tools persist user prefs across sessions.</p>
+    <div class="kv">tools: recall_similar_briefs · memory · Genie</div>
+  </div>
+
+  <div class="card subagent role-composer">
+    <div class="head"><span class="ic">✍️</span><h4>Composer</h4></div>
+    <div class="meta">brief + write-back proposals</div>
+    <p>Synthesizes data + signals + history into executive markdown. Calls action tools to populate the UI Action Queue. Emits a JSON sidecar with severity score and pending actions.</p>
+    <div class="kv">tools: compose_brief · 4 action tools · UC AI Fns</div>
+  </div>
+
+  <div class="card subagent role-critic">
+    <div class="head"><span class="ic">🔍</span><h4>Critic</h4></div>
+    <div class="meta">quality gate · LLM-only</div>
+    <p>QCs the draft for groundedness, action specificity, severity calibration. Emits PASS/FAIL — Publisher appends the verdict to the final brief.</p>
+    <div class="kv">tools: none — pure judge</div>
+  </div>
+
+  <div class="card subagent role-publisher">
+    <div class="head"><span class="ic">📤</span><h4>Publisher</h4></div>
+    <div class="meta">canonical final emit</div>
+    <p>Picks the right final message from accumulated state (composer's brief > critique > data findings). Ensures the chat UI's "last message" is always the answer the user wants.</p>
+    <div class="kv">tools: none — pure router</div>
+  </div>
+
+  <div class="card subagent" style="border-top-color:var(--text)">
+    <div class="head"><span class="ic">🎼</span><h4>Plan-driven routing</h4></div>
+    <div class="meta">graph edges</div>
+    <p>The Supervisor picks the plan once. <code class="inline">route()</code> steps through it deterministically. Once exhausted, Publisher runs once → END. No expensive supervisor re-evaluation per hop.</p>
+    <div class="kv">file: agent_server/supervisor.py:600</div>
+  </div>
+
+</div>
+
+<h3>Sample timeline (full brief generation, ~70s)</h3>
+<div class="card">
+  <div class="timeline-evt"><span class="ts">+0.2s</span><span class="actor super">Supervisor</span><span class="msg">Plan (5 steps): data_analyst → signal_scout → historian → composer → critic. <em>Reasoning: user asked for full ops brief, need internal data + external signals + historical context + composed output + QC.</em></span></div>
+  <div class="timeline-evt"><span class="ts">+0.4s</span><span class="actor data">DataAnalyst</span><span class="msg">→ Genie MCP query_space_01f15aac…  shipment_metrics</span></div>
+  <div class="timeline-evt"><span class="ts">+18.7s</span><span class="actor data">DataAnalyst</span><span class="msg">In flight: 4,592 · At risk: 216 ($192,704) · Active disruptions: 3 (Weather×2, Labor×1) · Top tier: Consumer</span></div>
+  <div class="timeline-evt"><span class="ts">+19.1s</span><span class="actor scout">SignalScout</span><span class="msg">Fan-out across 17 signal tools (asyncio.gather)</span></div>
+  <div class="timeline-evt"><span class="ts">+45.8s</span><span class="actor scout">SignalScout</span><span class="msg">14 NWS alerts (TN/TX/GA), M5.2 quake Adak AK, 6 EONET wildfires, diesel $5.523/gal (↓), Port Huron 59min delay</span></div>
+  <div class="timeline-evt"><span class="ts">+46.0s</span><span class="actor hist">Historian</span><span class="msg">→ recall_similar_briefs(query="weather, labor, carrier")  Vector Search</span></div>
+  <div class="timeline-evt"><span class="ts">+51.3s</span><span class="actor hist">Historian</span><span class="msg">MEM weather appeared 5/15, 5/16, 5/27 — recurring. Port of LA labor 5/18-5/20.</span></div>
+  <div class="timeline-evt"><span class="ts">+51.6s</span><span class="actor comp">Composer</span><span class="msg">→ compose_brief(...) + propose_action × 4 + log_decision</span></div>
+  <div class="timeline-evt"><span class="ts">+68.2s</span><span class="actor comp">Composer</span><span class="msg">Brief composed (severity 7.2/10, 4 actions queued). Sidecar JSON emitted.</span></div>
+  <div class="timeline-evt"><span class="ts">+69.7s</span><span class="actor crit">Critic</span><span class="msg">PASS — all claims grounded, severity proportional.</span></div>
+  <div class="timeline-evt"><span class="ts">+70.1s</span><span class="actor pub">Publisher</span><span class="msg">Final → brief markdown + critic verdict. UI severity gauge animates to 7.2.</span></div>
+</div>
+</section>
+
+<!-- ============================== 4. SIGNALS ============================== -->
+<section id="signals">
+<hr class="spacer"><h2><span class="sec-num">04</span>17 real-time signal sources</h2>
+<p class="desc">9 government/agency feeds + 4 financial/news + 2 social + 2 maritime. Each tool returns a single string the LLM can read, prefixed with <span class="pill live"><span class="dot live"></span>LIVE</span> or <span class="pill info"><span class="dot synth"></span>SYNTH</span>. Every tool has a deterministic synthetic fallback so the demo never breaks on a 429.</p>
+
+<table class="t">
+  <thead><tr><th style="width:36px">#</th><th>Source</th><th>What it tells us</th><th style="width:80px">Status</th><th>Notable real value (live test)</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>NWS Alerts <a class="ext" href="https://api.weather.gov" target="_blank">↗</a></td><td>Severe weather (NOAA)</td><td><span class="pill live"><span class="dot live"></span>LIVE</span></td><td>14 active alerts across TN/TX/GA</td></tr>
+    <tr><td>2</td><td>GDELT 2.0 <a class="ext" href="https://api.gdeltproject.org" target="_blank">↗</a></td><td>15-min global news pulse</td><td><span class="pill live"><span class="dot live"></span>LIVE</span></td><td>Frequent 429 — synth fallback active</td></tr>
+    <tr><td>3</td><td>IMF PortWatch</td><td>Port vessel flow</td><td><span class="pill live"><span class="dot live"></span>LIVE</span></td><td>Houston 7,358 vessel calls</td></tr>
+    <tr><td>4</td><td>OpenSky ADS-B</td><td>Live carrier hub air traffic</td><td><span class="pill live"><span class="dot live"></span>LIVE</span></td><td>9 tracked aircraft at MEM</td></tr>
+    <tr><td>5</td><td>USGS Earthquakes</td><td>M≥4 in US</td><td><span class="pill live"><span class="dot live"></span>LIVE</span></td><td>M5.2 49km ESE of Adak AK</td></tr>
+    <tr><td>6</td><td>FEMA Disasters</td><td>Last-7-day declarations</td><td><span class="pill live"><span class="dot live"></span>LIVE</span></td><td>1 CA chemical release</td></tr>
+    <tr><td>7</td><td>NASA EONET</td><td>Active natural events</td><td><span class="pill live"><span class="dot live"></span>LIVE</span></td><td>6 wildfires (ID, OR)</td></tr>
+    <tr><td>8</td><td>Reddit RSS</td><td>r/supplychain + r/logistics + r/freight</td><td><span class="pill live"><span class="dot live"></span>LIVE</span></td><td>60 fresh posts</td></tr>
+    <tr><td>9</td><td>Google News RSS</td><td>Supply-chain headlines</td><td><span class="pill live"><span class="dot live"></span>LIVE</span></td><td>UP/NS merger + Strait of Hormuz</td></tr>
+    <tr><td>10</td><td>FAA TFRs</td><td>Temporary flight restrictions</td><td><span class="pill live"><span class="dot live"></span>LIVE</span></td><td>84 active TFRs nationwide</td></tr>
+    <tr><td>11</td><td>CBP Border Waits</td><td>Commercial-truck lane delays</td><td><span class="pill live"><span class="dot live"></span>LIVE</span></td><td>Port Huron Canada — 59 min</td></tr>
+    <tr><td>12</td><td>HackerNews Algolia</td><td>Supply-chain story pulse</td><td><span class="pill live"><span class="dot live"></span>LIVE</span></td><td>"Composer/Packagist supply chain security" (22 pts)</td></tr>
+    <tr><td>13</td><td>EIA Petroleum</td><td>US on-highway diesel $/gal</td><td><span class="pill live"><span class="dot live"></span>LIVE</span></td><td>$5.523/gal (w/w ↓ -$0.073)</td></tr>
+    <tr><td>14</td><td>USGS Volcanoes</td><td>Active alert volcanoes</td><td><span class="pill live"><span class="dot live"></span>LIVE</span></td><td>Great Sitkin AK WATCH/ORANGE</td></tr>
+    <tr><td>15</td><td>NOAA NHC</td><td>Active named storms</td><td><span class="pill live"><span class="dot live"></span>LIVE</span></td><td>0 active (correct for late May)</td></tr>
+    <tr><td>16</td><td>CDC HAN</td><td>Health Alert Network</td><td><span class="pill info"><span class="dot synth"></span>SYNTH</span></td><td>Endpoint retired upstream</td></tr>
+    <tr><td>17</td><td>IMF PortWatch chokepoints</td><td>Suez/Panama/Hormuz/Malacca/Dover</td><td><span class="pill live"><span class="dot live"></span>LIVE</span></td><td>Bab-el-Mandeb 43 vessels (z=+1.61)</td></tr>
+  </tbody>
+</table>
+</section>
+
+<!-- ============================== 5. UC AI FUNCTIONS ============================== -->
+<section id="ucfns">
+<hr class="spacer"><h2><span class="sec-num">05</span>Unity Catalog AI Functions <span class="pill purple" style="font-size:11px;margin-left:8px">Stage 2 — AI Functions</span></h2>
+<p class="desc">Three governed SQL UDFs in <code class="inline">dnb_hackathon_west_2.ops_brief</code>, each powered by <code class="inline">ai_query</code> or <code class="inline">ai_classify</code>. Registered via <code class="inline">setup_uc_functions.py</code>, granted EXECUTE, and bound as agent tools via <code class="inline">UCFunctionToolkit</code>. Lineage, ACL, and billing all flow through Unity Catalog.</p>
+
+<div class="grid cols-3">
+  <div class="card bordered-l">
+    <div class="head"><span class="ic">🏷️</span><h4>classify_disruption_severity</h4></div>
+    <div class="meta">ai_classify → critical | elevated | nominal</div>
+    <p>Buckets free-text disruption descriptions. Used by Composer + SignalScout for consistent severity tagging across heterogeneous signal sources.</p>
+    <pre style="margin-top:8px;font-size:10.5px">SELECT classify_disruption_severity(
+  'Severe winter storm at MEM hub —
+   200mph winds, multiple cancellations.'
+) → 'critical'</pre>
+  </div>
+  <div class="card bordered-l">
+    <div class="head"><span class="ic">📝</span><h4>summarize_signal_pulse</h4></div>
+    <div class="meta">ai_query · executive sentence</div>
+    <p>Compresses N raw signal blurbs into one executive sentence with the most material concern. Used by SignalScout to keep the brief tight.</p>
+    <pre style="margin-top:8px;font-size:10.5px">→ "Seismic activity across multiple
+regions overnight; M5.2 quake 49km
+ESE of Adak, Alaska (Aleutians)
+accompanied by lesser M4.7 + M4.3…"</pre>
+  </div>
+  <div class="card bordered-l">
+    <div class="head"><span class="ic">⚖️</span><h4>carrier_risk_score</h4></div>
+    <div class="meta">ai_query · returns JSON</div>
+    <p>0-100 risk score for shipments tonight given a carrier's recent disruption history. JSON output (<code class="inline">{score, reasoning}</code>) so downstream code can parse.</p>
+    <pre style="margin-top:8px;font-size:10.5px">{
+  "score": 78,
+  "reasoning": "Active severe T-storm
+  warning over TN + two MEM hub
+  diversions in past 24h significantly
+  elevate likelihood of further sort."
+}</pre>
+  </div>
+</div>
+</section>
+
+<!-- ============================== 6. ACTIONS ============================== -->
+<section id="actions">
+<hr class="spacer"><h2><span class="sec-num">06</span>Action layer — write-back with HITL approval</h2>
+<p class="desc">The difference between a report and an operational system. The Composer proposes 2-4 actions per brief; each lands in the UI's Action Queue with Approve / Reject buttons. On approve, the action commits (in production: Jira, Slack, carrier comms; here: Delta + JSONL audit trail).</p>
+
+<div class="grid cols-4">
+  <div class="card">
+    <div class="head"><span class="ic">🚦</span><h4>propose_action</h4></div>
+    <div class="meta">generic write-back</div>
+    <p>Any imperative-verb-led action with severity, owner_role, impact estimate, related_objects. The canonical action proposal — Composer calls this 2-4× per brief.</p>
+  </div>
+  <div class="card">
+    <div class="head"><span class="ic">🎫</span><h4>file_disruption_ticket</h4></div>
+    <div class="meta">Jira-shape draft</div>
+    <p>Drafts a disruption-tracking ticket with affected carriers, FCs, lanes, and severity. Returns the draft (not yet sent — awaiting approval).</p>
+  </div>
+  <div class="card">
+    <div class="head"><span class="ic">📧</span><h4>draft_carrier_email</h4></div>
+    <div class="meta">outbound comms draft</div>
+    <p>Drafts an email to a named carrier (FedEx/UPS/etc.) with subject, body markdown, impacted-shipment count. Lands in the Action Queue.</p>
+  </div>
+  <div class="card">
+    <div class="head"><span class="ic">📒</span><h4>log_decision</h4></div>
+    <div class="meta">decisions_log audit trail</div>
+    <p>Appends a brief-level decision (headline, severity, themes, rationale) to the decisions log — both an in-memory ring buffer and a JSONL file.</p>
+  </div>
+</div>
+
+<h3>Action persistence</h3>
+<p class="lead">Every proposed action is double-written: (a) into an in-process <code class="inline">deque(maxlen=50)</code> the UI reads via <code class="inline">GET /actions/queue</code>, and (b) into <code class="inline">/tmp/ops_brief/actions.jsonl</code> for offline audit. Approve / Reject events append a new row with the operator's identity and timestamp.</p>
+</section>
+
+<!-- ============================== 7. RECALL ============================== -->
+<section id="recall">
+<hr class="spacer"><h2><span class="sec-num">07</span>Vector Search recall (Historian) <span class="pill info" style="font-size:11px;margin-left:8px">Stage 4 — Memory + MCP</span></h2>
+<p class="desc">14 nights of synthetic past briefs in a Delta table, embedded with <code class="inline">databricks-gte-large-en</code>, indexed in Vector Search. The Historian semantically queries past briefs and surfaces recurring themes.</p>
+
+<div class="grid cols-2">
+  <div class="card">
+    <h4>The setup</h4>
+    <ul class="checks">
+      <li class="done">Delta table <code class="inline">briefs_archive</code> · 14 rows (May 14–27 2026) · CDF enabled</li>
+      <li class="done">VS endpoint <code class="inline">ops_brief_vs</code> · STORAGE_OPTIMIZED · ONLINE</li>
+      <li class="done">VS index <code class="inline">briefs_archive_index</code> · Delta-Sync · TRIGGERED · embedding on <code class="inline">body_markdown</code></li>
+      <li class="done">Agent tool <code class="inline">recall_similar_briefs(query, days_back)</code> wired into Historian</li>
+      <li class="done">Delta-SELECT fallback if VS unavailable</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4>Live smoke test output</h4>
+    <pre style="margin:0;font-size:10.5px">query: "Memphis weather impact"
+
+🟢 LIVE — Databricks Vector Search
+hits: 3 (window: last 14 days)
+
+1. 2026-05-27  sev=69.0  similarity=0.620
+   Memphis severe weather AGAIN — recurring
+   storm pattern this month
+   themes=[MEM weather, FedEx hub risk, recurring]
+
+2. 2026-05-16  sev=64.0  similarity=0.607
+   themes=[MEM weather, FedEx delayed sort]
+
+3. 2026-05-15  sev=58.0  similarity=0.577
+   themes=[MEM weather, FedEx ground hold]</pre>
+  </div>
+</div>
+<p class="lead" style="margin-top:14px;">Cross-checked with <em>"Port of LA labor strike"</em> — correctly returned briefs from 5/18, 5/19, 5/20 (the consecutive labor-unrest cluster). Semantic discrimination is real, not just keyword overlap.</p>
+</section>
+
+<!-- ============================== 8. UI ============================== -->
+<section id="ui">
+<hr class="spacer"><h2><span class="sec-num">08</span>Operational Console UI</h2>
+<p class="desc">Not a chatbot. A 4-pane operational console — Palantir Foundry style, dense, light-theme-only, Nunito Sans + ShipBob design tokens. Single self-contained HTML page (~823 lines), no external assets except Google Fonts and marked.js for markdown rendering.</p>
+
+<div class="grid cols-2">
+  <div class="card">
+    <h4>The 4 panes</h4>
+    <ul class="checks">
+      <li class="done"><strong>Left rail — Signals.</strong> 17 live tiles (status dot · count · last-updated) refreshed every 60s via <code class="inline">/signals/latest</code></li>
+      <li class="done"><strong>Center — Brief.</strong> Rendered markdown with clickable object chips <code class="inline">[OBJ:FC-MEM]</code> and provenance chips <code class="inline">[CITE:query-id]</code></li>
+      <li class="done"><strong>Right rail — Actions.</strong> Approve/Reject buttons. Card flips to ✓ APPROVED on commit.</li>
+      <li class="done"><strong>Bottom — Timeline.</strong> Live supervisor → subagent → tool call transitions, color-coded by actor</li>
+    </ul>
+  </div>
+  <div class="card">
+    <h4>Investigation drill-down</h4>
+    <p>Click any object chip in the brief — <code class="inline">[OBJ:FC-MEM]</code>, <code class="inline">[OBJ:CARRIER-FEDEX]</code>, etc. — a slide-in panel pulls live properties from the SQL warehouse:</p>
+    <ul class="checks">
+      <li class="done">Properties: capacity, in-flight, at-risk, region</li>
+      <li class="done">Links: top carriers, active disruptions, related shipments</li>
+      <li class="done">Chained navigation: click any linked chip → new card</li>
+      <li class="done">Foundry-style Object Cards over Databricks Apps</li>
+    </ul>
+  </div>
+</div>
+
+<h3>Severity gauge + JSON sidecar</h3>
+<p class="lead">The Composer emits a trailing <code class="inline">```json {severity, pending_actions}```</code> block. The UI parses it, strips it from the displayed brief, animates the severity gauge from 0→7.2, and populates the Action Queue. Green <4, amber 4-7, red ≥7.</p>
+
+<h3>Endpoint surface</h3>
+<table class="t">
+  <thead><tr><th>Method</th><th>Path</th><th>Purpose</th></tr></thead>
+  <tbody>
+    <tr><td>POST</td><td><code class="inline">/invocations</code></td><td>Agent run (MLflow ResponsesAgent contract)</td></tr>
+    <tr><td>GET</td><td><code class="inline">/signals/latest</code></td><td>17-source fan-out, cached 60s</td></tr>
+    <tr><td>GET</td><td><code class="inline">/actions/queue</code></td><td>Pending action proposals</td></tr>
+    <tr><td>POST</td><td><code class="inline">/actions/approve</code></td><td>HITL approve</td></tr>
+    <tr><td>POST</td><td><code class="inline">/actions/reject</code></td><td>HITL reject</td></tr>
+    <tr><td>GET</td><td><code class="inline">/decisions</code></td><td>Recent decision-log entries</td></tr>
+    <tr><td>GET</td><td><code class="inline">/objects/lookup?id=…</code></td><td>Foundry-style object card lookup</td></tr>
+    <tr><td>GET</td><td><code class="inline">/debug/health</code></td><td>Env, tools, error count</td></tr>
+    <tr><td>GET</td><td><code class="inline">/debug/logs</code></td><td>Last 500 in-process log lines</td></tr>
+    <tr><td>GET</td><td><code class="inline">/debug/cost</code></td><td>Per-request token + tool-call telemetry</td></tr>
+  </tbody>
+</table>
+</section>
+
+<!-- ============================== 9. EVAL ============================== -->
+<section id="eval">
+<hr class="spacer"><h2><span class="sec-num">09</span>MLflow Agent Evaluation <span class="pill purple" style="font-size:11px;margin-left:8px">Stage 3 — MLflow</span></h2>
+<p class="desc">20-item golden dataset · 3 LLM-as-judge scorers · 911-line harness. Results land as logged tables + metrics in MLflow experiment 4469475842996134.</p>
+
+<h3>Scorers</h3>
+<div class="grid cols-3">
+  <div class="card">
+    <h4>groundedness</h4>
+    <p>Every numeric claim and named entity traces to source. Hallucinated FCs/carriers/$ = low score.</p>
+  </div>
+  <div class="card">
+    <h4>action_quality</h4>
+    <p>Are proposed actions specific (verb + object + owner) and proportional to severity?</p>
+  </div>
+  <div class="card">
+    <h4>subagent_routing</h4>
+    <p>Did the supervisor invoke the expected subagent set? Jaccard + LLM-judge hybrid.</p>
+  </div>
+</div>
+
+<h3>Run results</h3>
+<table class="t">
+  <thead><tr><th>Run</th><th>Items</th><th>groundedness</th><th>action_quality</th><th>subagent_routing</th><th>Avg latency</th><th>MLflow</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>Smoke (Run 1)</td>
+      <td class="center">2</td>
+      <td class="center"><strong>0.900</strong> <span class="sevbar"><div style="width:90%;background:var(--success)"></div></span></td>
+      <td class="center"><strong>0.875</strong> <span class="sevbar"><div style="width:87%;background:var(--success)"></div></span></td>
+      <td class="center"><strong>0.812</strong> <span class="sevbar"><div style="width:81%;background:var(--success)"></div></span></td>
+      <td class="right">67.6s</td>
+      <td class="mono small">ddd2ef0b</td>
+    </tr>
+    <tr>
+      <td>Run 2</td>
+      <td class="center">5</td>
+      <td class="center"><strong>0.600</strong> <span class="sevbar"><div style="width:60%;background:var(--warning)"></div></span></td>
+      <td class="center"><strong>0.900</strong> <span class="sevbar"><div style="width:90%;background:var(--success)"></div></span></td>
+      <td class="center"><strong>0.685</strong> <span class="sevbar"><div style="width:68%;background:var(--warning)"></div></span></td>
+      <td class="right">111.8s</td>
+      <td class="mono small">8804a5d5</td>
+    </tr>
+  </tbody>
+</table>
+<p class="small" style="margin-top:8px">⚠ <strong>5-item groundedness dip</strong>: one item ("which carrier has the most at-risk shipments?") hit a schema gap — per-carrier breakdown isn't yet a Metric View dimension. The agent caveated transparently; judge gave partial credit. Documented improvement in <code class="inline">EVAL_RESULTS.md</code>.</p>
+</section>
+
+<!-- ============================== 10. MATURITY LADDER ============================== -->
+<section id="maturity">
+<hr class="spacer"><h2><span class="sec-num">10</span>Databricks AI Maturity Ladder — all 4 stages</h2>
+<p class="desc">Databricks' official enablement slide teaches a 4-stage maturity ladder. Most projects hit one or two. This project visibly touches every stage.</p>
+
+<table class="t">
+  <thead><tr><th style="width:80px">Stage</th><th>Stack name</th><th>Where it lives in this project</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><span class="pill purple">Stage 1</span></td>
+      <td><strong>Text-to-SQL & Coding</strong> · Genie + Genie Code + AI/BI Genie</td>
+      <td>Managed Genie MCP server is the DataAnalyst's only data path. Genie Code customization workflows in <code class="inline">GENIE_CODE_CUSTOMIZATION.md</code> (explicit scoring criterion).</td>
+    </tr>
+    <tr>
+      <td><span class="pill purple">Stage 2</span></td>
+      <td><strong>AI Functions</strong> · AI Gateway + ai_query/ai_classify</td>
+      <td>3 governed UC SQL UDFs (<code class="inline">classify_disruption_severity</code>, <code class="inline">summarize_signal_pulse</code>, <code class="inline">carrier_risk_score</code>) powered by <code class="inline">ai_query</code> / <code class="inline">ai_classify</code>, exposed to the agent via <code class="inline">UCFunctionToolkit</code>.</td>
+    </tr>
+    <tr>
+      <td><span class="pill purple">Stage 3</span></td>
+      <td><strong>Build-Your-Own Agent</strong> · Agent Framework + Agents on Apps + MLflow</td>
+      <td>The whole multi-agent supervisor on a deployed Databricks App. MLflow 3 autolog + Agent Evaluation harness with 3 LLM-as-judge scorers.</td>
+    </tr>
+    <tr>
+      <td><span class="pill purple">Stage 4</span></td>
+      <td><strong>Agent Memory & Tools</strong> · Lakebase + MCP</td>
+      <td>Managed Genie MCP (data tools). Vector Search briefs archive for semantic recall (Historian). Lakebase wired (currently disabled — SP grant pending; falls back to InMemorySaver).</td>
+    </tr>
+  </tbody>
+</table>
+</section>
+
+<!-- ============================== 11. RUBRIC ============================== -->
+<section id="rubric">
+<hr class="spacer"><h2><span class="sec-num">11</span>Judging rubric — how this project scores</h2>
+<p class="desc">Track 1 Section 6 official rubric (verbatim weights). Below: each criterion mapped to what we built. Technical Excellence + Innovation + Business Impact = 75% of total; Demo is only 10% — <em>depth wins over polish</em>.</p>
+
+<div class="rubric">
+  <div class="rubric-h"><h4>1. Technical Excellence</h4><span class="weight">25%</span></div>
+  <div class="rubric-body">
+    <strong>What scores</strong><span>Effective use of Genie Code as agentic coding tool · Code quality/scalability · UC, Delta Lake, UC Metric Views, AI/BI Dashboards · Data security, governance, cost · <em>Instructions to customize Genie Code</em> · Adding MCP servers · Production readiness</span>
+    <strong>What we shipped</strong><span>
+      • <strong>Genie Code as primary workflow</strong> — `GENIE_CODE_CUSTOMIZATION.md` covers 4 named extension patterns (add signal / add UC AI Function / add subagent / add action)<br>
+      • <strong>3 MCP integrations</strong> — Managed Genie MCP, langchain_mcp_adapters at request time, UC Function MCP-equivalent via toolkit<br>
+      • <strong>UC Metric Views</strong> over Gold tables (3 measures: In Flight Count, At Risk Count, Revenue At Risk USD), Genie space scoped to MVs only<br>
+      • <strong>Production-readiness</strong>: graceful Lakebase fallback (no 30s hang on unreachable instance); 17 synthetic-fallback signal tools; MLflow eval harness with 3 scorers; cost telemetry middleware; debug endpoints (/health, /logs, /cost); MERGE-idempotent setup scripts
+    </span>
+  </div>
+</div>
+
+<div class="rubric">
+  <div class="rubric-h"><h4>2. Innovation & Creativity</h4><span class="weight">25%</span></div>
+  <div class="rubric-body">
+    <strong>What scores</strong><span>Originality of use case · Novel application of Genie Code · Creative integration of multiple Databricks features</span>
+    <strong>What we shipped</strong><span>
+      • <strong>Plan-driven supervisor</strong> (not ReAct-with-N-tools) — Pydantic structured-output planning is visible in MLflow traces<br>
+      • <strong>17 real-time external signals fused with internal Genie data</strong> — most multi-agent projects either go internal-only or external-only; we do both with parallel fan-out<br>
+      • <strong>Foundry-style object cards inside a Databricks App</strong> — clickable [OBJ:FC-MEM] chips drill into live warehouse data, chain to related entities<br>
+      • <strong>Action layer with HITL approval</strong> — write-back actions (file ticket, draft email, log decision) queue for human approval<br>
+      • <strong>Nightly Databricks Job (paused)</strong> — proactive mode, "vertical workflow not chatbot" pattern<br>
+      • <strong>Cost telemetry</strong> — per-request token + subagent-call counters surfaced at /debug/cost
+    </span>
+  </div>
+</div>
+
+<div class="rubric">
+  <div class="rubric-h"><h4>3. Business Impact & Relevance</h4><span class="weight">25%</span></div>
+  <div class="rubric-body">
+    <strong>What scores</strong><span>Clarity of business problem · Potential customer value · Applicability to real-world enterprise scenarios</span>
+    <strong>What we shipped</strong><span>
+      • <strong>Real, universal problem</strong> — every supply-chain operator has the "what hit overnight?" question. Every DNB customer with physical shipments cares.<br>
+      • <strong>Quantified impact</strong> — 4,592 in-flight tonight · 216 at-risk · $192,704 revenue at risk · 4 actions proposed and queued for human approval<br>
+      • <strong>Daily 30-min ops standup collapsed to 30-second scan</strong> — that's the headline ROI<br>
+      • <strong>Applies beyond logistics</strong> — same architecture works for finance ops (overnight market events), security ops (alert triage), platform ops (incident sweep). Domain-agnostic shape, domain-specific signals.
+    </span>
+  </div>
+</div>
+
+<div class="rubric">
+  <div class="rubric-h"><h4>4. Data & App Quality</h4><span class="weight">15%</span></div>
+  <div class="rubric-body">
+    <strong>What scores</strong><span>Functionality of Dashboards/Apps · UX for non-technical stakeholders · Quality of insights</span>
+    <strong>What we shipped</strong><span>
+      • <strong>4-pane operational console</strong> — signals · brief · actions · timeline. Light-theme. Dense, not chatbot-generic.<br>
+      • <strong>17 live signal tiles refreshing every 60s</strong> with status dots (live/synthetic/stale) — instant situational awareness without reading the brief<br>
+      • <strong>Severity gauge animates 0-10</strong> with color thresholds (green <4, amber 4-7, red ≥7)<br>
+      • <strong>Object chips → drill-down panel</strong> with chained navigation across FC → carrier → shipment → customer<br>
+      • <strong>Debug panel</strong> with Health / Logs / Errors / Copy-context buttons — judges can audit live
+    </span>
+  </div>
+</div>
+
+<div class="rubric">
+  <div class="rubric-h"><h4>5. Demo</h4><span class="weight">10%</span></div>
+  <div class="rubric-body">
+    <strong>What scores</strong><span>Clarity and storytelling · Communication to both technical and business audiences</span>
+    <strong>What we shipped</strong><span>
+      • <strong>3-min recording plan</strong> in `DEMO_SCRIPT.md` — timestamped, voice-over cues, architecture diagram on screen, MLflow cut, all 5 chat scenarios pre-canned<br>
+      • <strong>Submission summary</strong> `SUBMISSION.md` — every Rule §4.3 deliverable explicitly addressed<br>
+      • <strong>This overview page</strong> — judges can pre-watch the architecture before the video
+    </span>
+  </div>
+</div>
+</section>
+
+<!-- ============================== 12. SUBMISSION ============================== -->
+<section id="deliverables">
+<hr class="spacer"><h2><span class="sec-num">12</span>Submission checklist — Rule §4.3 deliverables</h2>
+<div class="card">
+<ul class="checks">
+  <li class="done"><strong>Working URL</strong> — https://ops-brief-apatel-7474650842988229.aws.databricksapps.com · App in RUNNING state</li>
+  <li class="todo"><strong>Code link</strong> — push to a GitHub repo (the form needs a code URL)</li>
+  <li class="todo"><strong>Screen recording demo</strong> — ~3 min, recorded on Lighthouse environment, per `DEMO_SCRIPT.md`</li>
+  <li class="done"><strong>Project description</strong> — `SUBMISSION.md` + `README_OPS_BRIEF.md`</li>
+  <li class="done"><strong>Lighthouse URL</strong> — workspace `dnb-hackathon-west-2`</li>
+  <li class="done"><strong>Original work</strong> — all artifacts timestamped May 22+ 2026 (within registration window)</li>
+  <li class="done"><strong>Genie Code customization doc</strong> — `GENIE_CODE_CUSTOMIZATION.md`</li>
+  <li class="done"><strong>MLflow eval results</strong> — `EVAL_RESULTS.md` + 2 logged MLflow runs</li>
+  <li class="warn"><strong>Submission deadline:</strong> Friday May 29 2026, 6:00 PM PT</li>
+</ul>
+</div>
+</section>
+
+<!-- ============================== 13. FILES ============================== -->
+<section id="files">
+<hr class="spacer"><h2><span class="sec-num">13</span>File map</h2>
+<div class="card">
+<pre style="margin:0;font-size:11px;line-height:1.7">ops-brief-project/                       # synthetic data + Genie + UC Fns + nightly job
+├── data/
+│   └── schema.sql                       # 9 Delta tables (~30k synthetic shipments)
+├── scripts/
+│   ├── setup_data.py                    # synth data + Metric Views (~3 min)
+│   ├── create_genie_space.py            # Genie space + 5 verified queries
+│   ├── setup_uc_functions.py            # 3 UC AI Functions (ai_classify / ai_query)
+│   ├── setup_briefs_archive.py          # 14-day briefs archive + Vector Search index
+│   └── register_nightly_job.py          # Databricks Job (23:00 CT, PAUSED)
+
+databricks-agent-on-apps-genie-mcp/      # the multi-agent app
+├── agent_server/
+│   ├── supervisor.py        (700+ LoC)  # LangGraph supervisor + 7 nodes + Plan schema
+│   ├── agent.py             (240 LoC)   # MLflow ResponsesAgent wiring
+│   ├── external_tools.py    (244 LoC)   # 4 original signal tools
+│   ├── external_tools_extra.py (517)    # 5 more signal tools
+│   ├── external_tools_v3.py (875 LoC)   # 8 more signal tools (FAA/CBP/HN/EIA/…)
+│   ├── uc_function_tools.py (56 LoC)    # UCFunctionToolkit binding
+│   ├── brief_tools.py       (92 LoC)    # compose_brief
+│   ├── action_tools.py      (326 LoC)   # 4 write-back action tools + ring buffer
+│   ├── recall_tools.py      (300+ LoC)  # Vector Search recall (Historian)
+│   ├── investigation_tools.py (240+)    # Object lookup (drill-down)
+│   ├── cost_telemetry.py    (175 LoC)   # per-request token + tool counters
+│   ├── endpoints.py         (220 LoC)   # /signals, /actions, /objects, /decisions
+│   ├── chat_ui.py           (~900 LoC)  # 4-pane operational console (single page)
+│   ├── debug_view.py        (89 LoC)    # /debug/health, /debug/logs
+│   ├── start_server.py      (110+ LoC)  # FastAPI assembly + lifespan
+│   ├── utils_memory.py      (254 LoC)   # Lakebase wiring (degraded fallback)
+│   └── utils.py             (346 LoC)   # MLflow + MCP client
+├── scripts/
+│   └── evaluate_agent.py    (911 LoC)   # 20-item golden + 3 LLM-as-judge scorers
+├── databricks.yml                       # bundle config (app, resources)
+├── DEMO_SCRIPT.md                       # 3-min recording plan
+├── GENIE_CODE_CUSTOMIZATION.md          # rubric scoring criterion
+├── SUBMISSION.md                        # formal submission summary
+├── EVAL_RESULTS.md                      # MLflow eval scores + improvement roadmap
+└── PROJECT_OVERVIEW.html                # this page</pre>
+</div>
+</section>
+
+</main>
+
+<footer>
+  Built May 22–29 2026 · 17 signal sources · 5 specialist subagents · 3 UC AI Functions · 4 write-back actions ·  14-day Vector Search recall · MLflow 3 traced · Genie MCP throughout · Light-theme operational console · ShipBob brand tokens<br><br>
+  <strong>This is a hackathon submission. No real company data anywhere. All synthetic. All open-source signal feeds.</strong>
+</footer>
+
+<script>
+  mermaid.initialize({startOnLoad:true,theme:'default',themeVariables:{primaryColor:'#e6f0ff',primaryTextColor:'#0049c7',primaryBorderColor:'#0061ff',lineColor:'#374151',secondaryColor:'#fef3c7',tertiaryColor:'#dcfce7',fontFamily:'Nunito Sans,sans-serif',fontSize:'13px'},flowchart:{curve:'basis',padding:18}});
+</script>
+
+</body>
+</html>

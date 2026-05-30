@@ -1,0 +1,74 @@
+bundle:
+  name: ops_brief
+  engine: direct
+
+resources:
+  apps:
+    ops_brief:
+      name: "ops-brief-apatel"
+      description: "11 PM Ops Brief — autonomous supply chain disruption agent powered by Genie MCP + external signals"
+      source_code_path: ./
+      user_api_scopes:
+        - mcp.genie
+      config:
+        command: ["uv", "run", "start-server"]
+        env:
+          - name: MLFLOW_TRACKING_URI
+            value: "databricks"
+          - name: MLFLOW_REGISTRY_URI
+            value: "databricks-uc"
+          - name: API_PROXY
+            value: "http://localhost:8000/invocations"
+          - name: CHAT_APP_PORT
+            value: "3000"
+          - name: CHAT_PROXY_TIMEOUT_SECONDS
+            value: "300"
+          - name: MLFLOW_EXPERIMENT_ID
+            value_from: "experiment"
+          - name: DATABRICKS_EMBEDDING_ENDPOINT
+            value: "databricks-gte-large-en"
+          # EIA fuel-price API key — registered key from eia.gov/opendata. Lets
+          # fetch_eia_fuel_prices() pull live US weekly retail diesel + regular
+          # gasoline averages instead of falling back to synthetic on DEMO_KEY rate-limits.
+          - name: EIA_API_KEY
+            value_from: "eia_api_key"
+          # LAKEBASE_INSTANCE_NAME intentionally unset: the app SP doesn't have a grant
+          # on the Lakebase instance, so setting it would cause every request to hang
+          # 30s on SQLAlchemy pool acquisition. Memory features fall back to in-process
+          # InMemorySaver. Re-add this env var only after granting the SP access.
+
+      # Resources granted to the app's service principal
+      resources:
+        - name: 'experiment'
+          experiment:
+            experiment_id: "4469475842996134"
+            permission: 'CAN_MANAGE'
+        # postgres resource grant deferred — app uses LAKEBASE_INSTANCE_NAME env var directly;
+        # memory tools may fail until Lakebase grant is added via workspace UI.
+        - name: ops_brief_disruption_shipment
+          genie_space:
+            name: "Ops Brief — Disruption & Shipment Analytics"
+            space_id: 01f15aac2d0a1f5bb72ff76a070ae337
+            permission: CAN_RUN
+        # Secret-scope binding for the EIA API key. Scope created via
+        #   databricks secrets create-scope ops_brief
+        #   databricks secrets put-secret ops_brief eia_api_key --string-value "<key>"
+        # SP READ grant via
+        #   databricks secrets put-acl ops_brief 1d7bc13e-9c60-4d08-b3b1-4b9d6a750d08 READ
+        - name: 'eia_api_key'
+          secret:
+            key: 'eia_api_key'
+            scope: 'ops_brief'
+            permission: 'READ'
+
+targets:
+  dev:
+    mode: development
+    default: true
+
+  prod:
+    mode: production
+    resources:
+      apps:
+        ops_brief:
+          name: ops-brief-apatel-prod
