@@ -15,6 +15,8 @@ picture, customers are already upset and the cost is already locked in.
 
 ## What we built
 
+<img width="859" height="558" alt="image" src="https://github.com/user-attachments/assets/237c81a3-47c6-4658-a146-1d53270df1db" />
+
 **The 11 PM Ops Brief** is an autonomous LangGraph agent deployed as a Databricks App. Every night
 at 11 PM (or on-demand from chat) it executes this pipeline:
 
