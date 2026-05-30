@@ -132,7 +132,7 @@ Registered job `ops_brief_nightly_2300CT` (ID 65664408676995, paused) — nightl
 5. **2:05–2:30** Cut to MLflow workspace UI showing the eval scores
 6. **2:30–2:55** Close on the architecture diagram with all 4 maturity stages highlighted
 
-## 4 · Why This Wins the Rubric
+## 4 · Rubric Coverage
 
 | Rubric category | Weight | How this scores |
 |---|---|---|
@@ -147,7 +147,7 @@ Registered job `ops_brief_nightly_2300CT` (ID 65664408676995, paused) — nightl
 - ✅ **Working URL:** https://ops-brief-apatel-7474650842988229.aws.databricksapps.com
 - ✅ **Code link:** this repository
 - ✅ **Video demo:** recorded per `DEMO_SCRIPT.md` (see submission form attachment)
-- ✅ **Project description:** this file + `README_OPS_BRIEF.md`
+- ✅ **Project description:** this file + `README.md`
 - ✅ **Lighthouse URL:** workspace `dnb-hackathon-west-2`
 - ✅ **Original work:** built on top of the public Databricks `databricks-agent-on-apps-genie-mcp` template (open-source, permissive license); all hackathon-specific code/agents/UI authored May 20+ 2026.
 

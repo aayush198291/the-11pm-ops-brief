@@ -120,23 +120,4 @@ Or for a focused query:
 | `databricks-agent-on-apps-genie-mcp/agent_server/external_tools.py` | NWS / GDELT / PortWatch / OpenSky fetchers (with synthetic fallback) |
 | `databricks-agent-on-apps-genie-mcp/agent_server/brief_tools.py` | The structured `compose_brief` synthesis tool |
 | `databricks-agent-on-apps-genie-mcp/databricks.yml` | Bundle config + Genie + experiment + (no Postgres in v1) resource grants |
-| `databricks-agent-on-apps-genie-mcp/scripts/eval_ops_brief.py` | MLflow eval — runs the benchmark, scores with 5 LLM judges |
-| `databricks-agent-on-apps-genie-mcp/GENIE_CODE_CUSTOMIZATION.md` | How to extend with Genie Code (Track 1 scoring criterion) |
-
-## Why this wins
-
-| Rubric Item (Track 1, Section 6) | How we score |
-|---|---|
-| Effective use of Genie Code as agentic coding tool | `GENIE_CODE_CUSTOMIZATION.md` provides skills + instructions + worked prompts |
-| Use of Databricks native features | Genie + Genie MCP + UC Metric Views + UC + Delta + AI/BI + Model Serving + MLflow + Lakebase — all stitched together |
-| Data security, governance, cost | OBO auth via Apps, UC-governed data, serverless compute (auto-stops), Lakebase per-user scope |
-| MCP servers to connect to external tools | Managed Genie MCP server scoped to Metric Views |
-| Production readiness | MLflow eval, deterministic synthetic fallbacks, idempotent setup scripts, bundle deploy |
-| Originality of use case | "Autonomous nightly brief that wakes up the ops team" — no other Devpost has shipped this |
-| Novel application of Genie Code | Genie Code + Genie MCP — same Genie used as both dev assistant and as agent sub-agent |
-| Creative integration of multiple Databricks features | All 4 stages of the AI Journey ladder represented in one project |
-| Clarity of business problem | Universal across DNB customers — every ops team has this morning-scramble pain |
-| Real-world enterprise scenarios | Demo data shaped after real 3PL operations (synthetic but believable) |
-| Functionality of Apps | Live URL, OAuth-secured, multi-agent topology |
-| Quality of insights | Cross-source synthesis (internal + 4 external + memory recall) |
-| Demo storytelling | "Last night's brief vs tonight's" memory moment + live agent reasoning trace |
+| `databricks-agent-on-apps-genie-mcp/scripts/eval_ops_brief.py` | MLflow eval — runs the benchmark, scores with LLM judges |
