@@ -123,7 +123,6 @@ Registered job `ops_brief_nightly_2300CT` (ID 65664408676995, paused) — nightl
 
 ## 3 · Demo Flow
 
-(Full timestamped script in `DEMO_SCRIPT.md`.)
 
 1. **0:00–0:20** Hook + landing on the operational console
 2. **0:20–0:55** Click "Generate tonight's full ops brief" → watch the supervisor plan + dispatch 5 subagents in the timeline pane
@@ -140,13 +139,13 @@ Registered job `ops_brief_nightly_2300CT` (ID 65664408676995, paused) — nightl
 | **Innovation & Creativity** | 25% | Plan-driven supervisor (not "ReAct + lots of tools"). Object chip → investigation drawer = Foundry pattern in a Databricks App. **Action layer** with HITL approval (4 write-back tools). 17 live external signal sources from public agencies that normally don't appear together (NWS, IMF PortWatch, USGS, FEMA, NASA, FAA, CBP, EIA, openFDA…). |
 | **Business Impact & Relevance** | 25% | Every supply-chain ops team has this problem. Quantified: tonight ~4,592 in-flight shipments, $192K revenue at risk, 216 at-risk shipments tracked. The brief collapses a daily 30-min stand-up into a 30-second scan, with 4 proposed actions ready for human approval. |
 | **Data & App Quality** | 15% | 4-pane operational console (Apps, not a chatbot): live signal tiles refreshing 60s, severity gauge, object drill-downs (FC → carrier → shipment), action queue, agent timeline. Light-theme, design-token-clean. Dense, utilitarian. |
-| **Demo** | 10% | 3-min recorded video walking the full flow + architecture + MLflow eval scores. Script in `DEMO_SCRIPT.md`. |
+| **Demo** | 10% | 3-min recorded video walking the full flow + architecture + MLflow eval scores. |
 
 ## 5 · Submission Deliverables (Rule §4.3)
 
 - ✅ **Working URL:** https://ops-brief-apatel-7474650842988229.aws.databricksapps.com
 - ✅ **Code link:** this repository
-- ✅ **Video demo:** recorded per `DEMO_SCRIPT.md` (see submission form attachment)
+- ✅ **Video demo:** 3-min recording (see submission form attachment)
 - ✅ **Project description:** this file + `README.md`
 - ✅ **Lighthouse URL:** workspace `dnb-hackathon-west-2`
 - ✅ **Original work:** built on top of the public Databricks `databricks-agent-on-apps-genie-mcp` template (open-source, permissive license); all hackathon-specific code/agents/UI authored May 20+ 2026.
@@ -211,6 +210,5 @@ databricks-agent-on-apps-genie-mcp/      # the multi-agent app
 ├── scripts/
 │   └── evaluate_agent.py                # 20-item golden + 3 LLM-as-judge scorers
 ├── databricks.yml                       # bundle config (app, resources)
-├── DEMO_SCRIPT.md                       # 3-min recording plan + speaker script
 └── SUBMISSION.md                        # this file
 ```

@@ -218,3 +218,4 @@ e2e-chatbot-app-next/
 mlflow.db
 mlflow.db-*
 mlruns/
+DEMO_SCRIPT.md
